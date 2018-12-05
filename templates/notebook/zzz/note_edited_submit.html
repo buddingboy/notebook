@@ -1,0 +1,67 @@
+
+    <!-- Modal Structure -->
+    <div id="note_edited_model" class="modal">
+      <div class="modal-content">
+
+
+       <form class = "col s12" action="{% url 'note_post' %}" id="note_edit_form" method="PUT">
+        {% csrf_token %}
+
+        <input type="hidden" name="entry_pk" value="new">
+
+        <div class = "row">
+         <div class = "input-field col s8">
+          <!-- <i class = "material-icons prefix">ac_unit</i> -->
+          <input placeholder = "Title" value = "" id = "title" name="title" type = "text" class = "active validate" required />
+          <label for = "title">Title</label>
+        </div>
+
+        <div class = "input-field col s4">
+          <!-- <i class = "material-icons prefix">insert_link</i> -->
+          <input placeholder = "Source" id = "source" name="source" type = "text" class = "">
+          <label for = "source">Source</label>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="input-field col s4">
+          <select multiple name='paper' id="paper_select">
+            <option value="1">GS1</option>
+            <option value="2">GS2</option>
+            <option value="3">GS3</option>
+            <option value="4">GS4</option>
+            <option value="5">Essay</option>
+            <option value="6">Philosophy</option>
+          </select>
+          <label>Paper</label>
+        </div>
+
+        <div class="input-field col s8" id="topic_select">
+          <select multiple name="topic">
+            <option value="1">Option 1</option>
+            <option value="2">Option 2</option>
+            <option value="3">Option 3</option>
+          </select>
+          <label>Topic</label>
+        </div>
+      </div>
+
+      <div class = "row">
+       <div class = "input-field col s12">
+        <!-- <i class = "material-icons prefix">mode_edit</i> -->
+        <textarea id = "details" name='details' class = "materialize-textarea"></textarea>
+        <label for = "details">Details</label>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn waves-effect waves-green" type="submit" name="note_submit" id="note_edited_submit">Submit
+        <i class="material-icons right">send</i>
+      </button>
+      <a href="#!" class="modal-close waves-effect waves-red btn-flat">Disagree</a>
+    </div>
+
+  </form>
+
+</div>
+</div>

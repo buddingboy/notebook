@@ -1,0 +1,341 @@
+{% extends "notebook/base.html" %}
+{% load staticfiles%}
+
+{% block title %}My Notebook{% endblock %}
+
+{% block nav %}
+{% include "notebook/navigation.html" %}
+{% endblock %}
+
+{% block css %}
+
+
+<!-- <link href={% static "vendor/summernote-0.8.9-dist/dist/summernote.css" %} rel="stylesheet"> -->
+
+{% endblock %}
+
+{% block content %}
+<div class="wrapper">
+
+  <div class="feed_area">
+
+    <div class="posts" id="posts">
+      {% for note in posts.object_list %}
+      <div class="post" id="{{note.pk}}">
+
+        <span class="sn">{{forloop.counter0|add:posts.start_index }}</span>
+        <span class="date date_style" data-value="{{note.date}}">
+          {% if note.date %}<i class="far fa-calendar-alt"></i><br>{{ note.date|slice:":6" }}<br>{{ note.date|slice:"8:12" }}{% endif %}
+        </span>
+
+        {% if note.prelims %}
+        <span class="prelims" data-value="{{note.prelims}}"><span class="prelims_indicator">Pre</span></span>
+        {% else %}
+        <span class="prelims empty" data-value=""></span>
+        {% endif %}
+
+        {% if note.paper.all %}
+        <span class="paper" data-value="[{% for each in note.paper.all %}{{each.pk}},{% endfor %}]">
+         {% for each in note.paper.all %} <span class="mychip">{{each.paper_name}}</span> {% endfor %}
+       </span>
+       {% else %}
+       <span class="paper" data-value="[]"></span>
+       {% endif %}
+
+
+       <span class="topic">{{note.topic}}</span>
+
+
+       <div class="post_controls">
+        <span class="source"><a target="_blank" id="source_link_{{note.pk}}" href="{{note.source}}"><i class="fas fa-external-link-alt"></i></a></span>
+
+        <ul id="dropdown_pc_{{note.pk}}" class="dropdown-content">
+          <li><a class="modal-trigger edit_form_btn" href="#post_model" data-pk="{{note.pk}}">Edit</a></li>
+          <li><a class="delete_note_btn" href="" data-pk="{{note.pk}}">Delete</a></li>
+        </ul>
+        <a class="dropdown-trigger" href="#!" data-target="dropdown_pc_{{note.pk}}"><i class="fas fa-ellipsis-v"></i></a>
+      </div>
+
+      <p class="title">{{note.title}}</p>
+      <div class="details" data-value="{{note.details}}">{{note.details|safe}}</div>
+    </div>
+    {% endfor %}
+  </div>
+
+</div><!--/feed_area -->
+
+{% include "notebook/submit_note_model.html" %}</br></br>
+
+
+
+</div><!--/container -->
+{% endblock content %}
+
+
+
+
+
+
+{% block js %}
+
+<script src="{% static 'vendor/tinymce/tinymce.min.js' %}"></script>
+
+<!-- <script src="https://cloud.tinymce.com/stable/tinymce.min.js"></script> -->
+
+<script type="text/javascript">
+
+  tinymce.init({
+    selector: "#details",
+    height: 200,
+
+    plugins: "save table image link emoticons visualblocks help fullscreen hr lists searchreplace textcolor paste media",
+    toolbar: [
+    'newdocument save | removeformat pastetext | formatselect fontselect fontsizeselect | forecolor backcolor |',
+    'undo redo | bold italic underline strikethrough | link image emoticons | alignleft aligncenter alignright | hr indent outdent blockquote | table numlist bullist | searchreplace | fullscreen'
+    ],
+    // save_enablewhendirty: false,
+    link_context_toolbar: true,
+    // anchor_bottom: false,
+    // anchor_top: false,
+
+    setup: function (editor) {
+      editor.on('change', function () {
+        editor.save();
+      });
+    }
+  });
+
+</script>
+
+
+<script type="text/javascript">
+
+//side-nav collapser
+$(document).ready(function(){
+  $(".button-collapse").sidenav(); // Menu collapser
+  $('.collapsible').collapsible();// Initialize collapsible (uncomment the line below if you use the dropdown variation)
+  //drop-down init
+  $('.dropdown-trigger').dropdown({
+    alignment:'right',
+    coverTrigger: false,
+    hover: true,
+
+  }
+  );
+});
+
+//model initialise
+$(document).ready(function(){
+  $('.modal').modal({
+    // endingTop: '5%',
+    // onCloseEnd: ,
+  });
+  $('select').formSelect();
+  $('.datepicker').datepicker({
+    yearRange: 1,
+    showClearBtn: true,
+    format: 'dd mmm, yyyy',
+    autoClose: true,
+    showDaysInNextAndPreviousMonths: true,
+
+  });
+});
+
+function myRefresh(delay_time) {
+  setTimeout(function() { location.reload(); }, delay_time);
+}
+
+var successFunction = function(response) {
+  var Modalelem = document.querySelectorAll('.modal');
+  var instance = M.Modal.init(Modalelem);
+  console.log(instance);
+  var i;
+  for (i = 0; i < instance.length; i++) {
+    instance[i].close();
+  }
+
+  swal("Successful!", "Your action completed successfully!", "success");
+  myRefresh(1200);
+}
+
+</script>
+
+
+<script type="text/javascript">
+  $(document).ready(function(){
+    $(".edit_form_btn").click(function(){
+    // console.log($(this));
+    var note_id = $(this).attr("data-pk");
+    var edit_form = document.forms['note_form'];
+    edit_form.reset();
+    data_paper = $('#'+note_id).children('.paper').attr("data-value");
+    // console.log(eval(data_paper));
+
+    edit_form.action = '{% url 'note_post' %}' + note_id;
+    // edit_form.method = 'PUT';
+    // console.log(edit_form.action);
+    // console.log($('#'+note_id).children('.details').html());
+
+    edit_form.elements["entry_pk"].value = note_id;
+    edit_form.elements["source"].value = document.getElementById('source_link_'+note_id).href;
+    edit_form.elements["topic"].value = $('#'+note_id).find('.topic').text();
+    edit_form.elements["title"].value = $('#'+note_id).children('.title').text();
+    edit_form.elements["date"].value = $('#'+note_id).children('.date').attr("data-value");
+    // edit_form.elements["details"].value = $('#'+note_id).children('.details').attr("data-value");
+
+    var details_DATA = $('#'+note_id).children('.details').attr("data-value");
+    tinyMCE.get('details').setContent(details_DATA);
+    tinymce.get('details').save();
+
+    // edit_form.elements["prelims"].value = $('#'+note_id).children('.prelims').attr("data-value");
+
+    if ('True' == $('#'+note_id).children('.prelims').attr("data-value")){
+      $(edit_form.elements["prelims"]).attr("checked", "checked")
+    };
+
+    $('#paper_select').val(eval(data_paper));
+    $('#paper_select').formSelect();
+
+    M.updateTextFields();
+    M.textareaAutoResize($('#details'));
+
+  });
+
+    $("#new_form_btn").click(function(){
+      var new_form = document.forms['note_form'];
+      new_form.reset();
+      new_form.action = '{% url 'note_post' %}';
+      new_form.method = 'POST';
+
+      M.updateTextFields();
+      M.textareaAutoResize($('#details'));
+    });
+
+
+    $(".delete_note_btn").click(function(e){
+      e.preventDefault();
+      var note_id = $(this).attr("data-pk");
+      var action_url = "{% url 'note_post' %}delete/" + note_id;
+      swal({
+        title: "Are you sure?",
+        text: "Once deleted, you will not be able to recover this!",
+        icon: "warning",
+        buttons: true,
+        dangerMode: true,
+      })
+      .then((willDelete) => {
+        if (willDelete) {
+          fetch(action_url);
+          swal("Poof! Note has been deleted!", {
+            icon: "success",
+          });
+          myRefresh(1200);
+        } else {
+          swal("Your Note is safe!");
+        }
+      })
+
+    });
+
+
+  });
+
+
+</script>
+
+
+<script type="text/javascript">
+ $(document).ready(function(){
+  $("#note_form").validate({
+
+    rules: {
+      title: {
+        required: true,
+        minlength: 5
+      },
+      date: {
+        required: true,
+        minlength: 2
+      },
+      source: {
+        required: true,
+        minlength: 10,
+        maxlength: 200
+      },
+    },
+      //For custom messages
+      messages: {
+        title: {
+          required: "Please enter the Title.",
+          minlength: "Title should be atleast 5 character long !"
+        },
+        date: {
+          required: "Please enter the date",
+          minlength: "Title should be atleast 5 character long !"
+        },
+        source: {
+          required: "Please enter source URL",
+          minlength: "Title should be atleast 10 character long !"
+        },
+      },
+
+
+    });
+});
+</script>
+
+
+<script>
+  $('#note_submit').click(function(e){
+    e.preventDefault();
+    $form_data = $(this).closest("form")[0];
+    console.log($($form_data).valid());
+    console.log($form_data);
+
+    if ($($form_data).valid()) {
+
+
+      var form = new FormData($form_data);
+
+      $this_button = $(this);
+      $(this).html('wait..').addClass('loading_btn');
+
+      console.log($form_data);
+      var action_url = $form_data.getAttribute('action');
+      var action_method = $form_data.getAttribute('method');
+
+
+      $.ajax({
+        type: action_method,
+        // Use the name of the url not '/textbook/'
+        url: action_url,
+        data: form,
+        cache: false,
+        //must, tell jQuery not to process the data
+        contentType: false,
+        processData: false,
+        success: function(data, status, jqXHR) {
+          console.log(jqXHR.status);
+          if (status == "success" || jqXHR.status == 204) {
+            $this_button.html("Success");
+            successFunction();
+          } else {
+
+          }
+        },
+        error: function (rs, e) {
+          alert(data);
+        }
+      });
+
+    } else {
+
+    }
+  });
+</script>
+
+
+
+
+{% endblock %}
+

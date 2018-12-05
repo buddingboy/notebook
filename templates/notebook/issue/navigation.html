@@ -1,0 +1,40 @@
+{% load staticfiles %}
+
+<ul id="nav-mobile" class="sidenav sidenav-fixed" style="transform: translateX(0px);">
+	<li>
+		<div class="user-view">
+			<div class="background">
+				<img src="{% static 'images/office.jpg' %}">
+			</div>
+			<a href="#!user"><img class="circle" src="{% static 'images/user.jpg' %}"></a>
+			<a href="#!name"><span class="name">Gaurav Yadav</span></a>
+			<a href="#!email"><span class="email">sendtogy@gmail.com</span></a>
+		</div>
+	</li>
+	<li class="search">
+		<div class="search-wrapper">
+			<form action="">
+				<input id="search" placeholder="Search Issue" name="issue">
+				<button type="submit"><i class="fas fa-search"></i></button>
+			</form>
+		</div>
+	</li>
+	<li><div class="divider"></div></li>
+
+	<li><a href="{% url 'issues' %}">Home</a></li>
+	<li><a href="{% url 'notebook' %}">Notebook</a></li>
+
+</ul>
+
+
+<!-- <a href="#" data-activates="slide-out" class="button-collapse hide-on-large-only"><i class="material-icons">menu</i></a>
+-->
+<div class="container"><a href="#" data-activates="nav-mobile" class="button-collapse top-nav full hide-on-large-only"><i class="material-icons">menu</i></a></div>
+
+
+
+
+
+
+
+

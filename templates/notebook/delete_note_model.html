@@ -1,0 +1,29 @@
+
+
+<!-- Modal Structure -->
+<div id="delete_model" class="modal">
+  <div class="modal-content">
+
+
+   <form class = "col s12" action="{% url 'note_post' %}delete/" id="note_form_delete" method="POST">
+    {% csrf_token %}
+
+    <input type="hidden" name="entry_pk" value="new">
+
+    <div class = "row">
+      <div class = "col s12">
+        <h3>Are you sure?</h3>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn waves-effect waves-red red" type="submit" name="note_delete_submit" id="note_delete_submit">Delete
+        <i class="fas fa-trash-alt"></i>
+      </button>
+      <a href="#!" class="modal-close waves-effect btn "><i class="fas fa-times"></i></a>
+    </div>
+
+  </form>
+
+</div>
+</div>

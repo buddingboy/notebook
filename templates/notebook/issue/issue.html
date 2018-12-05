@@ -1,0 +1,428 @@
+{% extends "notebook/issue/base.html" %}
+{% load staticfiles%}
+
+{% block title %}Issue Manager{% endblock %}
+
+{% block nav %}
+{% include "notebook/issue/navigation.html" %}
+{% endblock %}
+
+{% block content %}
+<div class="wrapper">
+
+	<div class="feed_area">
+
+		<div class="posts issues" id="posts">
+			{% for issue in issues.object_list %}
+
+			<div class="post issue" id="{{issue.pk}}">
+
+				<span class="sn">{{forloop.counter0|add:issues.start_index }}</span>
+				<span class="date date_style" data-value="{{issue.date}}">
+					{% if issue.created_at %}
+					<i class="far fa-calendar-alt"></i><br>{{ issue.date|slice:":6" }}<br>{{ issue.date|slice:"8:12" }}
+					{% endif %}
+				</span>
+
+				<div class="post_controls">
+					<span class="source"><a target="_blank" id="source_link_{{issue.pk}}" href="{{issue.source}}"><i class="fas fa-external-link-alt"></i></a></span>
+					<ul id="dropdown_pc_{{issue.pk}}" class="dropdown-content">
+						<li><a class="modal-trigger edit_form_btn" href="#post_model" data-pk="{{issue.pk}}">Edit</a></li>
+						<li><a class="delete_note_btn" href="" data-pk="{{issue.pk}}">Delete</a></li>
+					</ul>
+					<a class="dropdown-trigger" href="#!" data-target="dropdown_pc_{{issue.pk}}"><i class="fas fa-ellipsis-v"></i></a>
+				</div>
+
+				<p class="title">{{issue.title}}</p>
+				<div class="details" data-value="{{issue.details}}">{{issue.details|linebreaks}}</div>
+
+				<div class="left-align">
+					<a class="waves-effect waves-light modal-trigger bullet_form_btn" data-issue="{{issue.pk}}" href="#bullet_model"><i class="fas fa-plus"></i> Add</a>
+				</div>
+
+				<div class="bullets">
+					{% with issue.bullet_set.all as bullets %}
+
+					{% regroup bullets|dictsort:"group" by group as bullet_group_list %}
+
+					{% for each_group in bullet_group_list %}
+					<span class="bd-group-heading">{{each_group.grouper }}</span>
+					{% for bullet in each_group.list %}
+					<div class="bullet_wrapper" id="bd_{{bullet.pk}}">
+
+						<div class="bullet_data">
+							{% if bullet.label %}
+							<span class="bd-label">{{bullet.label}}</span>
+							{% endif %}
+							<span class="bd-title">{{bullet.title}}</span>
+							<span class="bd-group">{{bullet.group}}</span>
+							<span class="bd-meta">{{bullet.meta}}</span>
+							<span class="bd-details">{{bullet.details}}</span>
+						</div>
+
+						<div class="bullet_controls">
+							<span class="source"><a target="_blank" id="bd-source-{{bullet.pk}}" href="{{bullet.source}}"><i class="fas fa-link"></i></a></span>
+							<ul id="dropdown_bc_{{bullet.pk}}" class="dropdown-content">
+								<li><a class="modal-trigger edit_bulletform_btn" href="#bullet_model" data-issue="{{issue.pk}}" data-pk="{{bullet.pk}}">Edit</a></li>
+								<li><a class="delete_bullet_btn" href="" data-pk="{{bullet.pk}}">Delete</a></li>
+							</ul>
+							<a class="dropdown-trigger" href="#!" data-target="dropdown_bc_{{bullet.pk}}"><i class="fas fa-angle-down"></i></a>
+						</div>
+
+					</div>
+					{% endfor %}
+					{% endfor %}
+
+					{% endwith %}
+				</div>
+
+
+			</div>
+
+
+
+			{% endfor %}
+		</div>
+
+	</div><!--/feed_area -->
+
+
+
+{% include "notebook/issue/submit_issue_model.html" %}</br></br>
+{% include "notebook/issue/submit_bullet_model.html" %}</br></br>
+
+
+
+
+</div><!--/container -->
+{% endblock content %}
+
+
+
+
+
+
+{% block js %}
+
+
+<script type="text/javascript">
+
+
+//side-nav collapser
+$(document).ready(function(){
+	$(".button-collapse").sidenav(); // Menu collapser
+	$('.collapsible').collapsible();// Initialize collapsible (uncomment the line below if you use the dropdown variation)
+	//drop-down init
+	$('.dropdown-trigger').dropdown({
+		alignment:'right',
+		coverTrigger: false,
+		hover: true,
+
+	}
+	);
+});
+
+//model initialise
+$(document).ready(function(){
+	$('.modal').modal({
+		// endingTop: '5%',
+		// onCloseEnd: ,
+	});
+	$('select').formSelect();
+	$('.datepicker').datepicker({
+		yearRange: 1,
+		showClearBtn: true,
+		format: 'dd mmm, yyyy',
+
+	});
+});
+
+function myRefresh(delay_time) {
+	setTimeout(function() { location.reload(); }, delay_time);
+}
+
+var successFunction = function(response) {
+	var Modalelem = document.querySelectorAll('.modal');
+	var instance = M.Modal.init(Modalelem);
+	console.log(instance);
+	var i;
+	for (i = 0; i < instance.length; i++) {
+		instance[i].close();
+	}
+
+	swal("Successful!", "Your action completed successfully!", "success");
+	myRefresh(1200);
+}
+
+</script>
+
+<script type="text/javascript">
+	$(document).ready(function(){
+
+		$(".edit_form_btn").click(function(){
+			// console.log($(this));
+			var note_id = $(this).attr("data-pk");
+			var edit_form = document.forms['issue_form'];
+			edit_form.reset();
+			edit_form.action = '{% url 'api_issues' %}' + note_id;
+			// edit_form.method = 'PUT';
+			// console.log(edit_form.action);
+
+			edit_form.elements["entry_pk"].value = note_id;
+			edit_form.elements["source"].value = document.getElementById('source_link_'+note_id).href;
+			edit_form.elements["title"].value = $('#'+note_id).children('.title').text();
+			edit_form.elements["details"].value = $('#'+note_id).children('.details').attr("data-value");
+
+			M.updateTextFields();
+			M.textareaAutoResize($('#details'));
+		});
+
+		$(".edit_bulletform_btn").click(function(){
+			// console.log($(this));
+			var bullet_id = $(this).attr("data-pk");
+			var edit_form = document.forms['bullet_form'];
+			edit_form.reset();
+			edit_form.action = '{% url 'api_bulletnotes' %}' + bullet_id;
+
+
+			edit_form.elements["issue"].value = $(this).attr("data-issue");
+			edit_form.elements["entry_pk"].value = bullet_id;
+			edit_form.elements["source"].value = document.getElementById('bd-source-'+bullet_id).href;
+			edit_form.elements["title"].value = $('#bd_'+bullet_id).find('.bd-title').text();
+			edit_form.elements["label"].value = $('#bd_'+bullet_id).find('.bd-label').text();
+			edit_form.elements["group"].value = $('#bd_'+bullet_id).find('.bd-group').text();
+			edit_form.elements["meta"].value = $('#bd_'+bullet_id).find('.bd-meta').text();
+
+			// edit_form.elements["label"].value = $('#'+bullet_id).children('.details').attr("data-value");
+
+			M.updateTextFields();
+			M.textareaAutoResize($('#details'));
+		});
+
+		$("#new_form_btn").click(function(){
+			var new_form = document.forms['issue_form'];
+			new_form.reset();
+			new_form.action = '{% url 'api_issues' %}';
+			new_form.method = 'POST';
+
+			M.updateTextFields();
+			M.textareaAutoResize($('#details'));
+		});
+
+		$(".bullet_form_btn").click(function(){
+			var new_form = document.forms['bullet_form'];
+			new_form.reset();
+			new_form.action = '{% url 'api_bulletnotes' %}';
+			new_form.method = 'POST';
+			console.log("mama");
+			new_form.elements["issue"].value = $(this).attr("data-issue");
+
+			M.updateTextFields();
+			// M.textareaAutoResize($('#details'));
+		});
+
+
+
+
+		$(".delete_note_btn, .delete_bullet_btn").click(function(e){
+			e.preventDefault();
+			var key = $(this).attr("data-pk");
+			// console.log($(this).attr("class"));
+			if ($(this).attr("class") == 'delete_bullet_btn'){
+				var action_url = "{% url 'api_bulletnotes' %}" + key;
+			} else {
+				var action_url = "{% url 'api_issues' %}" + key;
+			}
+
+			swal({
+				title: "Are you sure?",
+				text: "Once deleted, you will not be able to recover this!",
+				icon: "warning",
+				buttons: true,
+				dangerMode: true,
+			})
+			.then((willDelete) => {
+				if (willDelete) {
+					$.ajax({
+						type: "DELETE",
+						url: action_url,
+						beforeSend: function(request) {
+							request.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+						},
+						success: function(data, status) {
+							swal("Poof! Your resume has been deleted!", {
+								icon: "success",
+							});
+							myRefresh(1200);
+						},
+						error: function(data, status) {
+							if (data.status === 403) {
+								swal("403 Error", "error");
+							} else {
+								swal("Oh noes!", "Something went wrong, can't be deleted!", "error");
+							}
+						}
+					});
+
+				} else {
+					swal("Your imaginary file is safe!");
+				}
+			})
+
+		});
+
+
+	});
+
+
+</script>
+
+
+<script type="text/javascript">
+	$(document).ready(function(){
+
+		$("#issue_form").validate({
+
+			rules: {
+				title: {
+					required: true,
+					minlength: 5
+				},
+			},
+			//For custom messages
+			messages: {
+				title: {
+					required: "Please enter the Title.",
+					minlength: "Title should be atleast 5 character long !"
+				},
+			},
+
+
+		});
+
+		$("#bullet_form").validate({
+
+			rules: {
+				title: {
+					required: true,
+					minlength: 5
+				},
+			},
+			//For custom messages
+			messages: {
+				title: {
+					required: "Please enter the Title.",
+					minlength: "Title should be atleast 5 character long !"
+				},
+			},
+
+
+		});
+
+	});
+</script>
+
+
+<script>
+	$('#note_submit').click(function(e){
+		e.preventDefault();
+		$form_data = $(this).closest("form")[0];
+		console.log($($form_data).valid());
+
+		if ($($form_data).valid()) {
+
+
+			var form = new FormData($form_data);
+
+			$this_button = $(this);
+			$(this).html('wait..').addClass('loading_btn');
+
+			console.log($form_data);
+			var action_url = $form_data.getAttribute('action');
+			var action_method = $form_data.getAttribute('method');
+
+
+			$.ajax({
+				type: action_method,
+				// Use the name of the url not '/textbook/'
+				url: action_url,
+				data: form,
+				cache: false,
+				//must, tell jQuery not to process the data
+				contentType: false,
+				processData: false,
+				success: function(data, status, jqXHR) {
+					console.log(jqXHR.status);
+					if (status == "success" || jqXHR.status == 204) {
+						$this_button.html("Success");
+						successFunction();
+					} else {
+
+					}
+				},
+				error: function (rs, e) {
+					alert(data);
+				}
+			});
+
+		} else {
+
+		}
+	});
+</script>
+
+
+<script type="text/javascript">
+	$('#bullet_submit').click(function(e){
+		e.preventDefault();
+		$form_data = $(this).closest("form")[0];
+		console.log($($form_data).valid());
+
+		if ($($form_data).valid()) {
+
+
+			var form = new FormData($form_data);
+
+			$this_button = $(this);
+			$(this).html('wait..').addClass('loading_btn');
+
+			console.log($form_data.elements["entry_pk"]);
+			console.log(form);
+
+			var action_url = $form_data.getAttribute('action');
+			var action_method = $form_data.getAttribute('method');
+
+
+			$.ajax({
+				type: action_method,
+				// Use the name of the url not '/textbook/'
+				url: action_url,
+				data: form,
+				cache: false,
+				//must, tell jQuery not to process the data
+				contentType: false,
+				processData: false,
+				success: function(data, status, jqXHR) {
+					console.log(jqXHR.status);
+					if (status == "success" || jqXHR.status == 204) {
+						$this_button.html("Success");
+						successFunction();
+					} else {
+
+					}
+				},
+				error: function (rs, e) {
+					alert(data);
+				}
+			});
+
+		} else {
+
+		}
+	});
+</script>
+
+
+
+{% endblock %}
+

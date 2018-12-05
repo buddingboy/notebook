@@ -1,0 +1,166 @@
+{% extends "notebook/base.html" %}
+{% load staticfiles%}
+
+{% block title %}My Notebook{% endblock %}
+
+{% block nav %}
+{% include "notebook/navigation.html" %}
+{% endblock %}
+
+{% block content %}
+<div class="container">
+
+  <div class="feed_area" ng-app="mainApp" ng-controller="myController">
+
+  {% include "notebook/post_model.html" %}</br></br>
+
+  <div class="post">
+    <span class="paper">GS1</span>
+    <span class="prelims">Prelims</span>
+
+    <span class="post_controls">
+      <span class="source"><a target="_blank" href="www.google.com"><i class="fas fa-external-link-alt"></i></a></span>
+      <ul id="dropdown2" class="dropdown-content">
+        <li><a href="www.google.com">Edit</a></li>
+        <li><a href="www.google.com">Delete</a></li>
+      </ul>
+      <a class="dropdown-trigger" href="#!" data-target="dropdown2"><i class="fas fa-ellipsis-v"></i></a>
+    </span>
+
+    <p class="title">The JSON syntax is derived from JavaScript object notation syntax, but the JSON ... format is </p>
+    <p class="details">
+      Building json2table: Turn JSON into an HTML table – Travis Horn
+      https://travishorn.com.
+    </p>
+  </div>
+
+  <a href="/post/?page=2">Refresh Link</a>
+
+
+
+
+  {% verbatim %}
+
+  <div class="posts" id="posts">
+
+
+    <div class="post" ng-repeat="post in posts" id="{{post.pk}}" {{extra}}>
+      <span class="paper">GS1 </span>
+      <span class="prelims">{{post.prelims}}</span>
+
+      <span class="post_controls">
+        <span class="source"><a target="_blank" href="{{post.url}}"><i class="fas fa-external-link-alt"></i></a></span>
+        <ul id="dropdown2" class="dropdown-content">
+          <li><a href="www.google.com" data-pk="{{post.pk}}">Edit</a></li>
+          <li><a href="www.google.com" data-pk="{{post.pk}}">Delete</a></li>
+        </ul>
+        <a class="dropdown-trigger" href="#!" data-target="dropdown2"><i class="fas fa-ellipsis-v"></i></a>
+      </span>
+
+      <p class="title">{{post.title}}</p>
+      <p class="details">
+        {{post.detail}}
+      </p>
+    </div>
+
+    {% endverbatim %}
+
+  </div>
+
+</div><!--/feed_area -->
+
+
+
+</div><!--/container -->
+{% endblock content %}
+
+
+
+
+
+
+{% block js %}
+<script type="text/javascript">
+
+
+//side-nav collapser
+$(document).ready(function(){
+  $(".button-collapse").sidenav(); // Menu collapser
+  $('.collapsible').collapsible();// Initialize collapsible (uncomment the line below if you use the dropdown variation)
+  //drop-down init
+  $('.dropdown-trigger').dropdown({
+    alignment:'right',
+    coverTrigger: false,
+  }
+  );
+});
+
+//model initialise
+$(document).ready(function(){
+  $('.modal').modal();
+  $('select').formSelect();
+});
+
+</script>
+
+
+
+
+<script>
+  $('#note_submit').click(function(e){
+    e.preventDefault();
+    $form_data = $(this).closest("form")[0];
+    var form = new FormData($form_data);
+
+    $this_button = $(this);
+    $(this).html('wait..').addClass('');
+
+    console.log(form);
+
+    $.ajax({
+      type: "POST",
+        // Use the name of the url not '/textbook/'
+        url: "{% url 'note_post' %}",
+        data: form,
+        cache: false,
+        //must, tell jQuery not to process the data
+        contentType: false,
+        processData: false,
+        success: function(data) {
+          if (data) {
+
+            $this_button.html("Deleted");
+          } else {
+
+          }
+        },
+        error: function (rs, e) {
+          alert('Sorry, there was an error. Please try again');
+        }
+      });
+  });
+</script>
+
+
+
+
+
+<script type="text/javascript">
+  var mainApp = angular.module('mainApp',[]);
+  mainApp.controller('myController', function ($scope,$http){
+   $http.get("{% url 'note_post' %}")
+   .then(function (response){
+    $scope.posts=response.data.data[0];
+    $scope.extra=response.data.data[1][0];
+    console.log($scope.posts[0].details);
+    console.log("2 " + $scope.extra);
+  },function (error){
+  });
+ });
+</script>
+
+
+
+
+{% endblock %}
+

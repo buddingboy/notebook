@@ -1,0 +1,135 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="author" content="Gaurav Yadav">
+
+	<title> {% block title %} {% endblock title %}</title>
+	<link rel='shortcut icon' href="{% static 'images/favicon.png' %}">
+	<link href="https://fonts.googleapis.com/css?family=Roboto:400,700" rel="stylesheet">
+	<!-- <link rel="stylesheet" href='{% static "node_modules/materialize-css/dist/css/materialize.min.css" %}'> -->
+
+	<!--Import Google Icon Font-->
+	<!-- <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"> -->
+	<!-- <link rel="stylesheet" href='{% static "node_modules/materialize-css/dist/css/materialize.min.css" %}'> -->
+	<link rel="stylesheet" href='{% static "node_modules/@fortawesome/fontawesome-free/css/all.css" %}'>
+	<!-- Compiled and minified CSS -->
+	<link rel="stylesheet" href='{% static "node_modules/materialize-css/dist/css/materialize.min.css" %}'>
+
+	<link href={% static "builds/helper.css" %} rel="stylesheet">
+	<link href={% static "builds/main.css" %} rel="stylesheet">
+
+	{% block css %} {% endblock css %}
+
+
+	<!-- <script src="{% static 'node_modules/angular/angular.js' %}"></script> -->
+
+</head>
+
+<body>
+	<header>
+		<div class="fixed-announcement">
+
+			<div class="announcement">
+				<div class="container center">
+
+					<div class="pagination">
+						<span class="step-links">
+							{% if posts.has_previous %}
+							<a href="?page=1" class="btn white wave-effect">&laquo; first</a>
+							<a href="?page={{ posts.previous_page_number }}" class="btn white wave-effect">previous</a>
+							{% endif %}
+
+							<span class="current">
+								 &nbsp;&nbsp; Page {{ posts.number }} of {{ posts.paginator.num_pages }}
+							</span>
+
+							{% if posts.has_next %}
+							<a href="?page={{ posts.next_page_number }}" class="btn white wave-effect">next</a>
+							<a href="?page={{ posts.paginator.num_pages }}" class="btn white wave-effect">last &raquo;</a>
+							{% endif %}
+						</span>
+					</div>
+
+						<!--
+						<form name="filter" id="filter" method="GET" action="">
+						<div class="input-field col s12">
+							<select name="page_size">
+								<option value="10">10</option>
+								<option value="20">20</option>
+								<option value="30">30</option>
+							</select>
+							<label>Materialize Select</label>
+							</div>
+
+							<button class="btn waves-effect waves-green green" type="submit" name="" id="">Submit
+								<i class="fas fa-paper-plane"></i>
+							</button>
+						</form> -->
+
+
+				</div>
+			</div>
+
+
+<!-- Modal Trigger -->
+<a class="btn-floating btn-large waves-effect waves-light red modal-trigger" id="new_form_btn" href="#post_model"><i class="fas fa-pen-fancy"></i></a>
+
+		</div>
+	</header>
+
+	{% block nav %}	{% endblock nav %}
+
+
+	<main>
+		{% block content %}
+		{% endblock content %}
+	</main>
+
+
+<!-- 		<footer class="page-footer">
+			<div class="container">
+				<div class="row">
+					<div class="col l6 s12">
+						<h5 class="white-text">Footer Content</h5>
+						<p class="grey-text text-lighten-4">You can use rows and columns here to organize your footer content.</p>
+					</div>
+					<div class="col l4 offset-l2 s12">
+						<h5 class="white-text">Links</h5>
+						<ul>
+							<li><a class="grey-text text-lighten-3" href="#!">Link 1</a></li>
+							<li><a class="grey-text text-lighten-3" href="#!">Link 2</a></li>
+							<li><a class="grey-text text-lighten-3" href="#!">Link 3</a></li>
+							<li><a class="grey-text text-lighten-3" href="#!">Link 4</a></li>
+						</ul>
+					</div>
+				</div>
+			</div>
+			<div class="footer-copyright">
+				<div class="container">
+					© 2014 Copyright Text
+					<a class="grey-text text-lighten-4 right" href="#!">More Links</a>
+				</div>
+			</div>
+		</footer> -->
+
+
+		<!-- Compiled and minified JavaScript -->
+
+		<script src="{% static 'node_modules/jquery/dist/jquery.min.js' %}"></script>
+		<script src="{% static 'node_modules/jquery-validation/dist/jquery.validate.min.js' %}"></script>
+		<script src="{% static 'node_modules/materialize-css/dist/js/materialize.min.js' %}"></script>
+		<script src="{% static 'node_modules/sweetalert/dist/sweetalert.min.js' %}"></script>
+
+
+
+		{% block js %} {% endblock js %}
+
+	</body>
+	</html>
+
+

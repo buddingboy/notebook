@@ -1,0 +1,75 @@
+{% load staticfiles %}
+
+<ul id="nav-mobile" class="sidenav sidenav-fixed" style="transform: translateX(0px);">
+	<li>
+		<div class="user-view">
+			<div class="background">
+				<img src="{% static 'images/office.jpg' %}">
+			</div>
+			<a href="#!user"><img class="circle" src="{% static 'images/user.jpg' %}"></a>
+			<a href="#!name"><span class="name">Gaurav Yadav</span></a>
+			<a href="#!email"><span class="email">sendtogy@gmail.com</span></a>
+		</div>
+	</li>
+	<li class="search">
+		<div class="search-wrapper">
+
+			<form action="{% url 'notebook' %}" id="search_form" method="GET">
+
+				<input id="search" placeholder="Search" name="q" />
+
+				<label>
+					<input name="s_area" type="radio" value="title" />
+					<span>Title</span>
+				</label>
+
+				<label>
+					<input name="s_area" type="radio" value="details" />
+					<span>Details</span>
+				</label>
+
+				<label>
+					<input name="s_area" type="radio" value="both" />
+					<span>Both</span>
+				</label>
+
+
+				<button class="btn waves-effect waves-green" type="submit">Search
+					<i class="fas fa-search"></i>
+				</button>
+
+			</form>
+
+		</div>
+	</li>
+
+	<li><a href="{% url 'notebook' %}">Home</a></li>
+	<li><a href="{% url 'issues' %}">Issue Manager</a></li>
+
+	<li><div class="divider"></div></li>
+	<li class="no-padding">
+		<ul class="collapsible collapsible-accordion">
+			<li class="bold"><a class="collapsible-header waves-effect waves-teal" tabindex="0">Components</a>
+				<div class="collapsible-body">
+					<ul>
+						<li><a href="badges.html">Badges</a></li>
+						<li><a href="buttons.html">Buttons</a></li>
+					</ul>
+				</div>
+			</li>
+		</ul>
+	</li>
+</ul>
+
+
+<!-- <a href="#" data-activates="slide-out" class="button-collapse hide-on-large-only"><i class="material-icons">menu</i></a>
+-->
+<div class="container"><a href="#" data-activates="nav-mobile" class="button-collapse top-nav full hide-on-large-only"><i class="material-icons">menu</i></a></div>
+
+
+
+
+
+
+
+

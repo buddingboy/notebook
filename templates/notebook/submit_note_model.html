@@ -1,0 +1,72 @@
+
+
+<!-- Modal Structure -->
+<div id="post_model" class="modal">
+  <div class="modal-content">
+
+
+   <form class = "col s12" action="{% url 'note_post' %}" id="note_form" method="POST">
+    {% csrf_token %}
+
+    <input type="hidden" name="entry_pk" value="new">
+
+    <div class = "row">
+      <div class = "input-field col s6">
+      <!-- <i class = "material-icons prefix">ac_unit</i> -->
+      <input value="" id="title" name="title" type="text" class="validate" required="" aria-required="true" />
+      <label for="title">Title</label>
+    </div>
+
+    <div class = "input-field col s3">
+      <!-- <i class = "material-icons prefix">insert_link</i> -->
+      <input id="source" name="source" type="text" class="">
+      <label for="source">Source</label>
+    </div>
+    <div class = "input-field col s3">
+      <!-- <i class = "material-icons prefix">insert_link</i> -->
+      <input type="text" class="datepicker" id="date" name="date">
+      <label for="date">Date</label>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="input-field col s6">
+      <input value = "" id = "topic" name="topic" type = "text" class = "" />
+      <label for="topic">Topic</label>
+    </div>
+    <div class="input-field col s3">
+      <select multiple name='paper' id="paper_select">
+        {% for paper in papers %}
+        <option value="{{paper.pk}}">{{paper.paper_name}}</option>
+        {% endfor %}
+      </select>
+      <label for="paper">Paper</label>
+    </div>
+    <div class="input-field col s3">
+      <label>
+        <input name="prelims" id="prelims-checkbox" type="checkbox" />
+        <span>Prelims</span>
+      </label>
+    </div>
+  </div>
+
+  <div class = "row">
+   <div class = "input-field col s12">
+    <!-- <i class = "material-icons prefix">mode_edit</i> -->
+    <textarea id = "details" name='details' class = "materialize-textarea"></textarea>
+    <!-- <label for = "details">Details</label> -->
+  </div>
+</div>
+
+
+<div class="modal-footer">
+  <button class="btn waves-effect waves-green" type="submit" name="note_submit" id="note_submit">Submit
+    <i class="fas fa-paper-plane"></i>
+  </button>
+  <a href="#!" class="modal-close waves-effect waves-red btn red"><i class="fas fa-times"></i></a>
+</div>
+
+</form>
+
+</div>
+</div>
